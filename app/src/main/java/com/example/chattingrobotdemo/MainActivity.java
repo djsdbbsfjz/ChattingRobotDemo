@@ -2,11 +2,13 @@ package com.example.chattingrobotdemo;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -27,7 +29,7 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
     //语音听写对象
     private SpeechRecognizer mIat;
     //语音听写UI
@@ -39,6 +41,7 @@ public class MainActivity extends Activity {
 
     private EditText mResultText;
     private Button mButton;
+    private Button mGotoSynBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +57,7 @@ public class MainActivity extends Activity {
     private void initLayout() {
         mResultText = (EditText) findViewById(R.id.iat_text);
         mButton = (Button) findViewById(R.id.iat_recognize);
+        mGotoSynBtn = (Button) findViewById(R.id.goto_syn_btn);
 
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,6 +76,14 @@ public class MainActivity extends Activity {
                 mIatDialog.setListener(mRecognizerDialogListener);
                 mIatDialog.show();
                 Toast.makeText(MainActivity.this, "请开始说话...", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        mGotoSynBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this,SynthesizerActivity.class);
+                startActivity(intent);
             }
         });
     }
@@ -184,5 +196,15 @@ public class MainActivity extends Activity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (null != mIat){
+            mIat.cancel();
+            mIat.destroy();
+        }
     }
 }
